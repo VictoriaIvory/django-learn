@@ -82,13 +82,20 @@ git config --global core.quotepath false # 中文文件名正常显示，不显�
 ### 4.2 关联远程并推送
 
 ```powershell
-cd D:\Code\python\django-learn
-git remote add origin https://github.com/VictoriaIvory/django-learn.git
+cd D:\ai宝贝\09_Django项目\django-learn
+git remote add origin git@github.com:VictoriaIvory/django-learn.git
 git push -u origin main
 ```
 
-第一次 push 会弹出浏览器让你登录 GitHub 并点 **Authorize**，
-授权信息由 Git Credential Manager 存进 Windows 凭据管理器，之后不用再登。
+> **本机用的是 SSH 认证，不是 HTTPS 账号密码。**
+> SSH 密钥已生成并加进 GitHub 账号：公钥 `C:\Users\Victoria\.ssh\id_ed25519.pub`，
+> 私钥 `C:\Users\Victoria\.ssh\id_ed25519`（**永远不要外传**）。
+> 验证：`ssh -T git@github.com`，看到 `Hi VictoriaIvory! You've successfully authenticated` 就对了。
+>
+> **为什么不用 HTTPS 自动登录**：Git for Windows 自带的凭证管理器（GCM 2.9.1）
+> 在这台机器上启动即崩溃（退出码 `0xE0434352`，.NET 未处理异常），走不通。
+
+第一次 push 用 `-u` 把本地 `main` 和远程 `main` 绑定，之后直接 `git push` 即可。
 
 ### 4.3 日常提交（以后每次改完都这样）
 
@@ -107,7 +114,7 @@ git push                      # 推到 GitHub
 | --- | --- | --- |
 | `rejected — fetch first` | 远程仓库不是空的（勾了 README） | 删掉仓库重回，或 `git pull --rebase origin main` |
 | `GH007: push would publish a private email` | 用了被 GitHub 设为私有的邮箱 | 改用 noreply 地址：`git commit --amend --reset-author` |
-| `fatal: not a git repository` | 不在项目目录 | `cd D:\Code\python\django-learn` |
+| `fatal: not a git repository` | 不在项目目录 | `cd D:\ai宝贝\09_Django项目\django-learn` |
 | `src refspec main does not match any` | 还没提交过 | 先 `git add -A` + `git commit` |
 | `Permission denied (publickey)` | 用了 SSH 但没配密钥 | 改用 HTTPS 地址（`https://...`，别用 `git@...`） |
 | 中文文件名显示成 `\344\275\240` | 未设 quotepath | `git config --global core.quotepath false` |

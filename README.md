@@ -12,7 +12,7 @@
 # Django 零基础实战 · 投票系统（polls）
 
 > 对应群任务：**搭建 Django 环境 + 熟悉 Django 框架**（2026 年 10 月第 4 周）
-> 项目位置：`D:\Code\python\django-learn`
+> 项目位置：`D:\ai宝贝\09_Django项目\django-learn`
 > GitHub 仓库：<https://github.com/VictoriaIvory/django-learn>
 
 ## 效果预览
@@ -36,14 +36,14 @@
 
 ### 方式 A：VS Code 里按 F5（最简单）
 
-1. VS Code 打开文件夹 `D:\Code\python\django-learn`
+1. VS Code 打开文件夹 `D:\ai宝贝\09_Django项目\django-learn`
 2. 按 `F5`，选 **Django: runserver**
 3. 浏览器打开 <http://127.0.0.1:8000/polls/>
 
 ### 方式 B：终端命令
 
 ```powershell
-cd D:\Code\python\django-learn
+cd D:\ai宝贝\09_Django项目\django-learn
 .\venv\Scripts\Activate.ps1      # 激活虚拟环境（提示符前会出现 (venv)）
 python manage.py runserver
 ```
