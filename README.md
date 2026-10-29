@@ -13,6 +13,7 @@
 
 > 对应群任务：**搭建 Django 环境 + 熟悉 Django 框架**（2026 年 10 月第 4 周）
 > 项目位置：`D:\Code\python\django-learn`
+> GitHub 仓库：<https://github.com/VictoriaIvory/django-learn>
 
 ## 效果预览
 
@@ -62,7 +63,8 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
 | 投票结果 | <http://127.0.0.1:8000/polls/1/results/> |
 | 后台管理 | <http://127.0.0.1:8000/admin/> |
 
-> 后台账号（**仅本地练习用**）：用户 `admin`，密码 `admin123456`
+> 后台账号：仓库里**不提供现成账号**（数据库文件不进 Git）。第一次用先执行
+> `python manage.py createsuperuser` 自己建一个，用户名和密码自己定。
 > 停止服务器：终端里按 `Ctrl + C`
 
 ## 2. 项目结构
@@ -70,7 +72,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
 ```text
 django-learn/
 ├── manage.py               # 项目管理入口，所有命令都从它开始
-├── db.sqlite3              # SQLite 数据库文件（已建好表 + 演示数据）
+├── db.sqlite3              # SQLite 数据库（本地生成，不进 Git；clone 后需 migrate + seed_demo）
 ├── requirements.txt        # 依赖清单（只有 Django）
 ├── venv/                   # 虚拟环境（不要提交到 Git）
 ├── mysite/                 # 项目配置包（一个项目可以有多个 app）
@@ -157,11 +159,15 @@ python manage.py runserver
 
 ## 6. 本周任务对照
 
-- [x] 搭好 Django 环境（Python 3.12 + Django 5.2 + venv）
-- [x] 熟悉 Django 框架（MVT、路由、视图、模板、模型、ORM、admin、测试）
-- [x] 跑通一个完整的小项目（投票系统，可投票、看结果、进后台）
-- [ ] GitHub 账号 id 报给王逸轩（见 `docs/群聊回复与GitHub指引.md`）
-- [ ] 过一遍 B 站视频对照（同上文档有观看建议）
+| 任务 | 状态 |
+| --- | --- |
+| 搭好 Django 环境（Python 3.12 + Django 5.2 + venv） | ✅ |
+| 熟悉 Django 框架（MVT、路由、视图、模板、模型、ORM、admin、测试） | ✅ |
+| 跑通一个完整的小项目（投票系统，可投票、看结果、进后台） | ✅ |
+| 安装 Git、配置提交身份 | ✅ |
+| 项目推送到 GitHub | ✅ <https://github.com/VictoriaIvory/django-learn> |
+| 把仓库链接报给王逸轩 | ⬜ 话术见 `docs/群聊回复与GitHub指引.md` |
+| 过一遍 B 站视频对照 | ⬜ 同上文档有观看建议 |
 
 ## 7. 测试结果
 

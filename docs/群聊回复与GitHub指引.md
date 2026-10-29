@@ -20,6 +20,7 @@ Django 这边已经跑通了一个投票系统的练习项目：
 这周我会把它扩展成一个自己想做的小应用并优化前端，再部署上线。
 
 GitHub: https://github.com/VictoriaIvory
+仓库: https://github.com/VictoriaIvory/django-learn
 ```
 
 **为什么这样说**：组长关心的不是你「都做完了」，而是你有没有在动、卡在哪、什么时候能交。把「已完成 / 进行中 / 下一步」说清楚，比一句「收到了」有用得多。
@@ -119,6 +120,10 @@ git push                      # 推到 GitHub
 - [x] 安装 Git
 - [x] 配置用户名 / 邮箱
 - [x] `git init` + 确认 `.env`、`venv/`、`db.sqlite3` 未被跟踪
-- [ ] 创建远程仓库 `django-learn`
-- [ ] 首次 `git push`
+- [x] 创建远程仓库 `django-learn`
+- [x] 首次 `git push`
 - [ ] 把仓库链接发到群里
+
+> 已上线：<https://github.com/VictoriaIvory/django-learn>
+> 认证方式用的是 **SSH 密钥**（比每次输密码稳，也不用把 token 存在聊天记录里）。
+> 公钥在 `C:\Users\Victoria\.ssh\id_ed25519.pub`，私钥同目录 `id_ed25519`（**永远不外传**）。
