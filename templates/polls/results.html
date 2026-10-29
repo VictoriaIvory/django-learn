@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}结果 · {{ question.question_text }}{% endblock %}
+
+{% block content %}
+<h1>{{ question.question_text }}</h1>
+<p class="meta">共 {{ total }} 票</p>
+
+<ul class="results">
+  {% for item in results %}
+    <li>
+      <div class="result-head">
+        <span>{{ item.choice.choice_text }}</span>
+        <strong>{{ item.choice.votes }} 票（{{ item.percent }}%）</strong>
+      </div>
+      <div class="bar-bg">
+        <div class="bar" style="width: {{ item.percent }}%"></div>
+      </div>
+    </li>
+  {% endfor %}
+</ul>
+
+<p class="links">
+  <a href="{% url 'polls:detail' question.id %}">再投一次</a>
+  · <a href="{% url 'polls:index' %}">返回列表</a>
+</p>
+{% endblock %}

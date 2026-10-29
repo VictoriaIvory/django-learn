@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ question.question_text }} · 投票系统{% endblock %}
+
+{% block content %}
+<h1>{{ question.question_text }}</h1>
+
+{% if error_message %}<p class="error">{{ error_message }}</p>{% endif %}
+
+<form action="{% url 'polls:vote' question.id %}" method="post">
+  {% csrf_token %}
+  {% for choice in question.choices.all %}
+    <label class="choice">
+      <input type="radio" name="choice" value="{{ choice.id }}">
+      <span>{{ choice.choice_text }}</span>
+    </label>
+  {% endfor %}
+
+  <button type="submit">投 票</button>
+</form>
+
+<p class="links">
+  <a href="{% url 'polls:results' question.id %}">查看结果</a>
+  · <a href="{% url 'polls:index' %}">返回列表</a>
+</p>
+{% endblock %}

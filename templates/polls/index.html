@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}投票列表 · 投票系统{% endblock %}
+
+{% block content %}
+<h1>进行中的投票</h1>
+
+{% if latest_question_list %}
+  <ul class="question-list">
+    {% for question in latest_question_list %}
+      <li>
+        <a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a>
+        <span class="meta">{{ question.choice_count }} 个选项 · {{ question.pub_date|date:"Y-m-d H:i" }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="empty">还没有任何投票。去 <a href="/admin/">后台</a> 添加一个吧～</p>
+{% endif %}
+{% endblock %}

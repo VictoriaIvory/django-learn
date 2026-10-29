@@ -1,0 +1,24 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}我的第一个 Django 项目{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'polls/style.css' %}">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="{% url 'polls:index' %}">🗳️ 投票系统</a>
+    <nav>
+      <a href="/admin/" target="_blank" rel="noopener">后台管理</a>
+    </nav>
+  </header>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>Django 5.2 · 零基础练习项目</footer>
+</body>
+</html>

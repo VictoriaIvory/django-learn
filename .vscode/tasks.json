@@ -1,0 +1,35 @@
+{
+  // 这些任务直接用 venv 里的 Python，绕过「终端有没有激活虚拟环境」的问题
+  // 用法：Ctrl+Shift+P → Tasks: Run Task → 选一个
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Django: 启动服务器 (8000)",
+      "type": "process",
+      "command": "${workspaceFolder}/venv/Scripts/python.exe",
+      "args": ["manage.py", "runserver", "127.0.0.1:8000"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "Django: 跑测试",
+      "type": "process",
+      "command": "${workspaceFolder}/venv/Scripts/python.exe",
+      "args": ["manage.py", "test", "-v", "2"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "Django: 数据库迁移",
+      "type": "process",
+      "command": "${workspaceFolder}/venv/Scripts/python.exe",
+      "args": ["manage.py", "migrate"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    }
+  ]
+}

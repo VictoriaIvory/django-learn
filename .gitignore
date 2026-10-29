@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+db.sqlite3
+.env
+
+# 虚拟环境
+venv/
+.venv/
+
+# 编辑器
+.idea/
+
+# 系统
+.DS_Store
+Thumbs.db
+
+# 本地环境配置（.env.example 要保留，它是模板）
+.env.local
+.env.*.local
+
+# 部署时 collectstatic 的产物
+staticfiles/
+
+# 日志
+*.log

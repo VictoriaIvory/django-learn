@@ -1,0 +1,20 @@
+{
+  // ── Python 解释器：指向项目自带的虚拟环境 venv ──
+  "python.defaultInterpreterPath": "${workspaceFolder}/venv/Scripts/python.exe",
+
+  // 新版「Python 环境」扩展默认只自动搜索 .venv 目录，
+  // 我们的环境叫 venv，所以显式把 venv 加进搜索路径，打开项目就能认出来
+  "python-envs.workspaceSearchPaths": [".venv", "venv", "*/.venv", "*/venv"],
+  "python-envs.defaultEnvManager": "ms-python.python:venv",
+  "python-envs.defaultPackageManager": "ms-python.python:pip",
+
+  // 新建终端时自动激活虚拟环境（提示符前出现 (venv)）
+  "python.terminal.activateEnvironment": true,
+
+  "files.encoding": "utf8",
+  "files.eol": "\r\n",
+  "editor.formatOnSave": false,
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  }
+}
