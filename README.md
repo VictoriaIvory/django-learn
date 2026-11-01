@@ -6,20 +6,27 @@
 - [x] 4. 常用命令
 - [x] 5. 换台电脑怎么复现
 - [x] 6. 本周任务对照
+- [x] 7. 测试结果
 
 ---
 
-# Django 零基础实战 · 投票系统（polls）
+# Django 实战 · 投票系统（polls）
 
 > 对应群任务：**搭建 Django 环境 + 熟悉 Django 框架**（2026 年 10 月第 4 周）
 > 项目位置：`D:\ai宝贝\09_Django项目\django-learn`
 > GitHub 仓库：<https://github.com/VictoriaIvory/django-learn>
 
+在官方教程的基础上加了三样：**网页端创建投票**、**结果页 SVG 饼图**、**局域网多设备投票**。
+
 ## 效果预览
 
-| 投票列表 | 投票页面 | 结果统计 |
-| --- | --- | --- |
-| ![列表页](docs/screenshot-index.png) | ![详情页](docs/screenshot-detail.png) | ![结果页](docs/screenshot-results.png) |
+| 投票列表 | 创建投票 |
+| --- | --- |
+| ![列表页](docs/screenshot-index.png) | ![创建投票页](docs/screenshot-create.png) |
+
+| 投票页面 | 结果统计（含占比饼图） |
+| --- | --- |
+| ![详情页](docs/screenshot-detail.png) | ![结果页](docs/screenshot-results.png) |
 
 ## 0. 环境信息
 
@@ -48,11 +55,13 @@ cd D:\ai宝贝\09_Django项目\django-learn
 python manage.py runserver
 ```
 
-如果报「无法加载文件 …Activate.ps1，因为在此系统上禁止运行脚本」，先执行一次：
-
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
-```
+> 本机已把 PowerShell 执行策略设为 `RemoteSigned`（仅当前用户），所以 `Activate.ps1`
+> 能直接运行。换到新电脑如果报「无法加载文件 …Activate.ps1，因为在此系统上禁止运行脚本」，
+> 执行一次即可：
+>
+> ```powershell
+> Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+> ```
 
 ### 页面地址
 
@@ -101,7 +110,7 @@ ipconfig
 django-learn/
 ├── manage.py               # 项目管理入口，所有命令都从它开始
 ├── db.sqlite3              # SQLite 数据库（本地生成，不进 Git；clone 后需 migrate + seed_demo）
-├── requirements.txt        # 依赖清单（只有 Django）
+├── requirements.txt        # 依赖清单（Django + python-dotenv）
 ├── venv/                   # 虚拟环境（不要提交到 Git）
 ├── mysite/                 # 项目配置包（一个项目可以有多个 app）
 │   ├── settings.py         # 全局配置：应用、数据库、语言、时区…
@@ -119,7 +128,11 @@ django-learn/
 │   └── management/commands/seed_demo.py   # 自定义命令：插演示数据
 ├── templates/              # T —— 模板（HTML）
 │   ├── base.html           # 母版：头部 / 导航 / 页脚
-│   └── polls/              # 各页面模板
+│   └── polls/
+│       ├── index.html      # 列表（含「＋ 创建一个投票」入口、每题票数）
+│       ├── create.html     # 创建投票（ModelForm）
+│       ├── detail.html     # 投票
+│       └── results.html    # 结果（SVG 饼图 + 条形图 + 领先项）
 └── .vscode/                # VS Code 配置（F5 启动、解释器路径）
 ```
 

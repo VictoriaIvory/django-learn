@@ -352,3 +352,142 @@ python manage.py test        # 跑全部
 8. 没有。QuerySet 是惰性的，遍历 / 切片 / `len()` 时才真正执行 SQL。
 
 </details>
+
+---
+
+## 13. 本周新增的四块（教程里没有的）
+
+### 13.1 ModelForm：在网页上创建投票
+
+以前只能在 admin 里建题，现在用户自己就能建。核心是 `polls/forms.py`：
+
+```python
+class QuestionCreateForm(forms.ModelForm):
+    choice_1 = forms.CharField(label='选项 1', max_length=200)
+    choice_2 = forms.CharField(label='选项 2', max_length=200)
+    choice_3 = forms.CharField(label='选项 3', max_length=200, required=False)
+
+    class Meta:
+        model = Question
+        fields = ['question_text']
+```
+
+要点：
+
+- `ModelForm` 按模型自动生成字段和校验，不用手写 `<input>`
+- 额外的 `choice_1/2/3` 不是 `Question` 的字段，是给 `Choice` 用的，所以单独声明
+- `required=False` 表示可留空（选项 3、4）
+
+**整体校验写在 `clean()` 里**——单字段校验用 `clean_<字段名>`，跨字段的用 `clean()`：
+
+```python
+def clean(self):
+    cleaned = super().clean()
+    filled = [cleaned.get('choice_%d' % i) for i in range(1, 5) if cleaned.get('choice_%d' % i)]
+    if len(filled) < 2:
+        raise forms.ValidationError('至少要填两个选项，不然投票没有意义。')
+    return cleaned
+```
+
+**视图里为什么要 `commit=False`**：
+
+```python
+question = form.save(commit=False)   # 先拿到对象，但不写库
+question.pub_date = timezone.now()   # 补上表单里没有的字段
+question.save()                      # 现在才 INSERT
+```
+
+因为 `pub_date` 不该让用户填（用户能随便改发布时间就不对了），所以表单里没有它，
+必须 `commit=False` 补上再存。
+
+### 13.2 annotate：让数据库帮你统计
+
+首页要显示「每题有几个选项、一共多少票」。笨办法是循环里一条条查，会查 N+1 次。
+正确做法是一次查询算完：
+
+```python
+Question.objects.filter(pub_date__lte=timezone.now()).annotate(
+    choice_count=Count('choices'),
+    total_votes=Sum('choices__votes'),
+)
+```
+
+它翻译成 SQL 的 `COUNT()` 和 `SUM()` 配合 `GROUP BY`，**所有统计在数据库里完成**，
+Python 只拿到结果。模板里直接 `{{ question.total_votes }}` 就行。
+
+> 注意：`Count` 和 `Sum` 作用在**同一个**关联表上是安全的；如果作用在两个不同的
+> 多对多/外键关系上，会产生笛卡尔积导致数字翻倍，那时要用 `distinct=True`。
+
+### 13.3 SVG 饼图：不引图表库
+
+结果页的环形图是纯 SVG 画的，没有任何 JS 依赖。原理只有一个：
+
+```html
+<circle pathLength="100"
+        stroke-dasharray="60 100"
+        stroke-dashoffset="-0" />
+```
+
+- `pathLength="100"` 把圆周长度**归一成 100**，于是 `stroke-dasharray` 可以直接写百分比
+- `stroke-dasharray="60 100"` = 画 60 份实线、100 份空白 → 一段 60% 的弧
+- `stroke-dashoffset="−起点"` 让这段弧从圆周的某个位置开始
+
+**视图负责算两个数**：
+
+```python
+running = 0.0
+for choice in choices:
+    ratio = choice.votes / total
+    pie_len = round(ratio * 100, 3)      # 弧长
+    pie_start = round(running * 100, 3)  # 起点 = 前面所有选项占比之和
+    running += ratio
+```
+
+> 起点要用「累积比」算，不能把「上一个选项的百分比」直接相加——四舍五入会让
+> 最后一段接不上、留一道缝。
+
+**踩过的坑**：`{# 注释 #}` 在 Django 里**只支持单行**。写成多行不会被当注释，
+会原样输出到页面上。多行注释要用 `{% comment %}...{% endcomment %}`。
+
+### 13.4 ALLOWED_HOSTS：为什么手机连不上
+
+现象：本机能开，手机输入电脑 IP 却报 400 / `DisallowedHost`。
+
+原因有两层，缺一不可：
+
+1. `runserver` 默认只监听 `127.0.0.1`（只有本机能连）→ 要改成 `0.0.0.0`
+2. Django 的 `ALLOWED_HOSTS` 只认白名单里的 Host → 要把手机访问用的 IP 加进去
+
+**第二层是故意的安全设计**（防 Host 头攻击），不是 bug。光改 `0.0.0.0` 没用。
+
+本项目的做法：`.env` 里设 `DJANGO_ALLOW_LAN=True`，`settings.py` 用
+`socket` 探测本机当前出网 IP 并自动加进 `ALLOWED_HOSTS`，换网络不用手改：
+
+```python
+if os.environ.get('DJANGO_ALLOW_LAN', '').lower() in ('1', 'true', 'yes', 'on'):
+    _sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    _sock.connect(('8.8.8.8', 80))      # UDP 不真的发包，只是让系统选一张网卡
+    _lan_ip = _sock.getsockname()[0]
+    ALLOWED_HOSTS.append(_lan_ip)
+```
+
+---
+
+## 14. 补充自测题（这周新增的）
+
+9. `ModelForm` 的 `commit=False` 到底「不做」什么？什么时候必须用它？
+10. `annotate(Count(...))` 比在 Python 里循环统计好在哪？
+11. 饼图里 `pathLength="100"` 起了什么作用？
+12. `{# #}` 和 `{% comment %}` 有什么区别？
+13. 为什么把 `runserver` 改成 `0.0.0.0` 之后，手机还是打不开？
+
+<details>
+<summary>参考答案</summary>
+
+9. 不写数据库。表单里缺少必填字段（如 `pub_date`）时，必须先拿到对象补上再 `save()`。
+10. 一条 SQL 在数据库里算完，避免 N+1 查询；数据量大时差距明显。
+11. 把圆周长度归一成 100 份，于是 `stroke-dasharray` 可以直接写百分比，不用算三角函数。
+12. `{# #}` 只能单行，多行会漏到页面上；`{% comment %}` 支持多行。
+13. 因为 `ALLOWED_HOSTS` 只认白名单，还要把手机访问用的 IP 加进去（防 Host 头攻击）。
+
+</details>

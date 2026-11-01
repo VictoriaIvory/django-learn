@@ -14,9 +14,11 @@
 【Django 主任务】
 投票系统跑通了，代码在 GitHub：
 https://github.com/VictoriaIvory/django-learn
-· 本地能启动，8 个自动化测试全过，覆盖 MVT、路由、模板、ORM、admin
-· 这周在它上面做了两处增强：结果页加「总票数 + 领先选项」，首页显示每题票数
-· 另外开放了局域网访问，手机连同一个 WiFi 就能投票（之前只能自己投，效果出不来）
+· 本地能启动，13 个自动化测试全过，覆盖 MVT、路由、模板、ORM、admin
+· 这周在它上面做了三处增强：
+  1. 网页上能直接创建投票（不用进后台），带表单校验
+  2. 结果页加了饼图看各选项占比（纯 SVG 画的，没引图表库）
+  3. 开放局域网访问，同一 WiFi 下手机也能投票（之前只能自己投，效果出不来）
 
 【附加任务】
 · git / GitHub：已装好，SSH 认证，进度一直在推
@@ -88,12 +90,19 @@ git config --global core.quotepath false # 中文文件名正常显示，不显�
 
 ```powershell
 cd D:\ai宝贝\09_Django项目\django-learn
-git remote add origin https://github.com/VictoriaIvory/django-learn.git
+git remote add origin git@github.com:VictoriaIvory/django-learn.git
 git push -u origin main
 ```
 
-第一次 push 会弹出浏览器让你登录 GitHub 并点 **Authorize**，
-授权信息由 Git Credential Manager 存进 Windows 凭据管理器，之后不用再登。
+> **本机用的是 SSH 认证，不是 HTTPS 账号密码。**
+> SSH 密钥已生成并加进 GitHub 账号：公钥 `C:\Users\Victoria\.ssh\id_ed25519.pub`，
+> 私钥 `C:\Users\Victoria\.ssh\id_ed25519`（**永远不要外传**）。
+> 验证：`ssh -T git@github.com`，看到 `Hi VictoriaIvory! You've successfully authenticated` 就对了。
+>
+> **为什么不用 HTTPS 自动登录**：Git for Windows 自带的凭证管理器（GCM 2.9.1）
+> 在这台机器上启动即崩溃（退出码 `0xE0434352`，.NET 未处理异常），走不通。
+
+第一次 push 用 `-u` 把本地 `main` 和远程 `main` 绑定，之后直接 `git push` 即可。
 
 ### 4.3 日常提交（以后每次改完都这样）
 
