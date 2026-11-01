@@ -10,7 +10,7 @@
     {% for question in latest_question_list %}
       <li>
         <a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a>
-        <span class="meta">{{ question.choice_count }} 个选项 · {{ question.pub_date|date:"Y-m-d H:i" }}</span>
+        <span class="meta">{{ question.choice_count }} 个选项 · {{ question.total_votes|default:0 }} 票 · {{ question.pub_date|date:"Y-m-d H:i" }}</span>
       </li>
     {% endfor %}
   </ul>

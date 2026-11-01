@@ -12,7 +12,7 @@
 # Django 零基础实战 · 投票系统（polls）
 
 > 对应群任务：**搭建 Django 环境 + 熟悉 Django 框架**（2026 年 10 月第 4 周）
-> 项目位置：`D:\Code\python\django-learn`
+> 项目位置：`D:\ai宝贝\09_Django项目\django-learn`
 > GitHub 仓库：<https://github.com/VictoriaIvory/django-learn>
 
 ## 效果预览
@@ -36,14 +36,14 @@
 
 ### 方式 A：VS Code 里按 F5（最简单）
 
-1. VS Code 打开文件夹 `D:\Code\python\django-learn`
+1. VS Code 打开文件夹 `D:\ai宝贝\09_Django项目\django-learn`
 2. 按 `F5`，选 **Django: runserver**
 3. 浏览器打开 <http://127.0.0.1:8000/polls/>
 
 ### 方式 B：终端命令
 
 ```powershell
-cd D:\Code\python\django-learn
+cd D:\ai宝贝\09_Django项目\django-learn
 .\venv\Scripts\Activate.ps1      # 激活虚拟环境（提示符前会出现 (venv)）
 python manage.py runserver
 ```
@@ -67,6 +67,33 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
 > `python manage.py createsuperuser` 自己建一个，用户名和密码自己定。
 > 停止服务器：终端里按 `Ctrl + C`
 
+### 局域网访问（手机也能投票）
+
+投票系统一个人投就没意义了。让同一个 WiFi 下的手机也能打开：
+
+```powershell
+# 1. 在 .env 里打开局域网开关（见 .env.example 的 DJANGO_ALLOW_LAN）
+#    DJANGO_ALLOW_LAN=True
+
+# 2. 用 0.0.0.0 启动，不再只监听本机
+python manage.py runserver 0.0.0.0:8000
+```
+
+```powershell
+# 3. 查本机的局域网 IP，找「无线局域网适配器 WLAN」下面的 IPv4 地址
+ipconfig
+```
+
+手机连同一个 WiFi，浏览器打开 `http://你的IP:8000/polls/` 就能投票。
+电脑上刷新结果页，票数会跟着变。
+
+> **为什么光改 `0.0.0.0` 不够**：Django 的 `ALLOWED_HOSTS` 只认白名单里的 Host，
+> 这是防「Host 头攻击」的安全设计。设了 `DJANGO_ALLOW_LAN=True` 之后，
+> `settings.py` 会自动探测本机当前的局域网 IP 并加进白名单，换网络不用手改。
+>
+> 第一次启动 Windows 会弹防火墙提示，勾「专用网络」然后允许。
+> 演示完把 `DJANGO_ALLOW_LAN` 改回 `False`。
+
 ## 2. 项目结构
 
 ```text
@@ -84,7 +111,7 @@ django-learn/
 │   ├── views.py            # V —— 视图：处理请求、返回响应
 │   ├── urls.py             # 应用路由
 │   ├── admin.py            # 后台注册
-│   ├── tests.py            # 自动化测试（5 个用例，全部通过）
+│   ├── tests.py            # 自动化测试（8 个用例，全部通过）
 │   ├── migrations/         # 数据库迁移记录，不要手改
 │   ├── static/polls/       # 静态文件（CSS）
 │   └── management/commands/seed_demo.py   # 自定义命令：插演示数据
@@ -104,6 +131,7 @@ django-learn/
 | **函数视图 FBV** | `views.py` | 一个函数接收 `request`，返回 `response` |
 | **模板渲染** | `templates/`、`render()` | `{{ 变量 }}`、`{% 标签 %}`、`{% extends %}` 继承 |
 | **模型 & ORM** | `polls/models.py` | 类 = 表，字段 = 列；`objects.filter()` 不用写 SQL |
+| **聚合查询 annotate** | `views.index` | `Count()` / `Sum()` 让数据库一次算出选项数和总票数 |
 | **外键关系** | `Choice.question` | `ForeignKey` + `related_name`，一对多 |
 | **数据库迁移** | `migrations/` | `makemigrations` 生成、`migrate` 执行 |
 | **后台管理** | `admin.py` | 注册模型就得到一整套增删改查页面 |
@@ -112,12 +140,14 @@ django-learn/
 | **静态文件** | `polls/static/` | `{% load static %}` + `{% static '...' %}` |
 | **自动化测试** | `tests.py` | `python manage.py test` |
 | **自定义命令** | `management/commands/` | `python manage.py seed_demo` |
+| **ALLOWED_HOSTS 与局域网** | `settings.py` | 默认只认本机（防 Host 头攻击）；开 LAN 开关后自动加本机 IP |
 
 ## 4. 常用命令
 
 ```powershell
 python manage.py check                 # 检查项目配置有没有问题
-python manage.py runserver             # 启动开发服务器（默认 8000 端口）
+python manage.py runserver             # 启动开发服务器（默认 8000 端口，只本机可访问）
+python manage.py runserver 0.0.0.0:8000  # 局域网可访问（手机投票演示用，需先开 ALLOW_LAN）
 python manage.py runserver 8080        # 换端口（8000 被占用时用）
 python manage.py makemigrations        # 模型改了 → 生成迁移文件
 python manage.py migrate               # 把迁移应用到数据库
@@ -164,6 +194,9 @@ python manage.py runserver
 | 搭好 Django 环境（Python 3.12 + Django 5.2 + venv） | ✅ |
 | 熟悉 Django 框架（MVT、路由、视图、模板、模型、ORM、admin、测试） | ✅ |
 | 跑通一个完整的小项目（投票系统，可投票、看结果、进后台） | ✅ |
+| 结果页加「总票数 + 领先选项」，首页显示每题票数 | ✅ |
+| 开放局域网访问，手机可投票（不再只能自己投） | ✅ |
+| 自动化测试从 5 个补到 8 个 | ✅ |
 | 安装 Git、配置提交身份 | ✅ |
 | 项目推送到 GitHub | ✅ <https://github.com/VictoriaIvory/django-learn> |
 | 把仓库链接报给王逸轩 | ⬜ 话术见 `docs/群聊回复与GitHub指引.md` |
@@ -172,14 +205,17 @@ python manage.py runserver
 ## 7. 测试结果
 
 ```text
-Found 5 test(s).
-test_detail_returns_404_for_missing_question ... ok
-test_index_lists_only_published_questions ... ok
-test_results_page_shows_votes ... ok
-test_vote_increments_and_redirects ... ok
-test_vote_without_choice_shows_error ... ok
+Found 8 test(s).
+test_detail_returns_404_for_missing_question ......... ok
+test_index_lists_only_published_questions ............ ok   # 只显示已发布的题
+test_index_shows_total_votes ......................... ok   # annotate 算出总票数
+test_results_page_shows_votes ........................ ok   # 百分比换算正确
+test_results_shows_leading_choice .................... ok   # 标出领先项
+test_results_with_no_votes_does_not_crash ............ ok   # 0 票时不 500
+test_vote_increments_and_redirects ................... ok   # 投票 +1 并重定向
+test_vote_without_choice_shows_error ................. ok   # 没选就提示
 
-Ran 5 tests in 0.243s
+Ran 8 tests in 0.099s
 OK
 ```
 

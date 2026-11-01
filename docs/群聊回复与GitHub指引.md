@@ -9,18 +9,23 @@
 组长原话是「请回复收到」，并要求把 **GitHub 账号 id** 报给他。可以直接发：
 
 ```
-收到。这几项我在推进：
-1. Linux：还在评估，我这台是联想拯救者 Y7000P，新硬件，先做启动盘试运行再决定是否双系统，不冒险动现有系统。
-2. DeepSeek / agent：还没接入，这周内申请。
-3. conda：目前用的是 venv 虚拟环境，正在补 conda，两种都会。
-4. git：已装好，Django 项目正在往 GitHub 推，推到后把仓库链接发群里。
+收到。
 
-Django 这边已经跑通了一个投票系统的练习项目：
-本地能启动，5 个自动化测试全过，覆盖 MVT、路由、模板、ORM、admin。
-这周我会把它扩展成一个自己想做的小应用并优化前端，再部署上线。
+【Django 主任务】
+投票系统跑通了，代码在 GitHub：
+https://github.com/VictoriaIvory/django-learn
+· 本地能启动，8 个自动化测试全过，覆盖 MVT、路由、模板、ORM、admin
+· 这周在它上面做了两处增强：结果页加「总票数 + 领先选项」，首页显示每题票数
+· 另外开放了局域网访问，手机连同一个 WiFi 就能投票（之前只能自己投，效果出不来）
+
+【附加任务】
+· git / GitHub：已装好，SSH 认证，进度一直在推
+· conda：已装 Miniconda，建了 Python 3.12 的环境
+· Linux：还没动。这台是新机器，评估后先不碰真机双系统，怕分区失误弄坏 Windows，
+         打算先用 WSL2 把环境和命令练熟再考虑
+· DeepSeek API：还没申请
 
 GitHub: https://github.com/VictoriaIvory
-仓库: https://github.com/VictoriaIvory/django-learn
 ```
 
 **为什么这样说**：组长关心的不是你「都做完了」，而是你有没有在动、卡在哪、什么时候能交。把「已完成 / 进行中 / 下一步」说清楚，比一句「收到了」有用得多。
@@ -82,7 +87,7 @@ git config --global core.quotepath false # 中文文件名正常显示，不显�
 ### 4.2 关联远程并推送
 
 ```powershell
-cd D:\Code\python\django-learn
+cd D:\ai宝贝\09_Django项目\django-learn
 git remote add origin https://github.com/VictoriaIvory/django-learn.git
 git push -u origin main
 ```
@@ -107,7 +112,7 @@ git push                      # 推到 GitHub
 | --- | --- | --- |
 | `rejected — fetch first` | 远程仓库不是空的（勾了 README） | 删掉仓库重回，或 `git pull --rebase origin main` |
 | `GH007: push would publish a private email` | 用了被 GitHub 设为私有的邮箱 | 改用 noreply 地址：`git commit --amend --reset-author` |
-| `fatal: not a git repository` | 不在项目目录 | `cd D:\Code\python\django-learn` |
+| `fatal: not a git repository` | 不在项目目录 | `cd D:\ai宝贝\09_Django项目\django-learn` |
 | `src refspec main does not match any` | 还没提交过 | 先 `git add -A` + `git commit` |
 | `Permission denied (publickey)` | 用了 SSH 但没配密钥 | 改用 HTTPS 地址（`https://...`，别用 `git@...`） |
 | 中文文件名显示成 `\344\275\240` | 未设 quotepath | `git config --global core.quotepath false` |

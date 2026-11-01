@@ -4,7 +4,14 @@
 
 {% block content %}
 <h1>{{ question.question_text }}</h1>
-<p class="meta">共 {{ total }} 票</p>
+<p class="meta">
+  共 {{ total }} 票
+  {% if leading %}
+    · 目前领先：<strong>{{ leading.choice_text }}</strong>（{{ leading.votes }} 票）
+  {% else %}
+    · 还没有人投票
+  {% endif %}
+</p>
 
 <ul class="results">
   {% for item in results %}

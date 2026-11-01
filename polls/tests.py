@@ -63,3 +63,36 @@ class PollsViewsTests(TestCase):
 
         self.assertContains(response, '火锅')
         self.assertContains(response, '75%')
+
+    def test_index_shows_total_votes(self):
+        """首页每题显示总票数（annotate 算出来的）。"""
+        question = self.create_question('今天吃什么？')
+        Choice.objects.create(question=question, choice_text='火锅', votes=3)
+        Choice.objects.create(question=question, choice_text='烧烤', votes=1)
+
+        response = self.client.get(reverse('polls:index'))
+
+        self.assertContains(response, '4 票')
+
+    def test_results_shows_leading_choice(self):
+        """结果页标出票数最高的选项。"""
+        question = self.create_question('今天吃什么？')
+        Choice.objects.create(question=question, choice_text='火锅', votes=3)
+        Choice.objects.create(question=question, choice_text='烧烤', votes=1)
+
+        response = self.client.get(reverse('polls:results', args=(question.id,)))
+
+        self.assertContains(response, '目前领先')
+        self.assertContains(response, '火锅')
+
+    def test_results_with_no_votes_does_not_crash(self):
+        """一票都没有时不能 500，也不能瞎标领先项。"""
+        question = self.create_question('还没人投的题')
+        Choice.objects.create(question=question, choice_text='A')
+        Choice.objects.create(question=question, choice_text='B')
+
+        response = self.client.get(reverse('polls:results', args=(question.id,)))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '还没有人投票')
+        self.assertNotContains(response, '目前领先')

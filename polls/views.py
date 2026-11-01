@@ -4,7 +4,7 @@
 等熟悉了可以再了解 Django 自带的「类视图」（CBV，如 ListView / DetailView）。
 """
 
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -16,10 +16,16 @@ from .models import Choice, Question
 
 def index(request):
     """首页：列出所有已发布的投票问题。"""
-    # QuerySet 就是「还没执行的 SQL 查询」，这里用 annotate 顺便统计每个问题有几个选项
+    # QuerySet 就是「还没执行的 SQL 查询」。
+    # annotate 会在查询里顺手算出两个统计值，避免在模板里一个个数：
+    #   choice_count —— 这题有几个选项
+    #   total_votes  —— 这题一共收了多少票
     latest_question_list = (
         Question.objects.filter(pub_date__lte=timezone.now())
-        .annotate(choice_count=Count('choices'))
+        .annotate(
+            choice_count=Count('choices'),
+            total_votes=Sum('choices__votes'),
+        )
     )
     context = {'latest_question_list': latest_question_list}
     # render 会把 context 塞进模板，生成最终 HTML
@@ -33,7 +39,7 @@ def detail(request, question_id):
 
 
 def results(request, question_id):
-    """结果页：显示每个选项的票数和占比。"""
+    """结果页：显示每个选项的票数、占比，以及当前领先项。"""
     question = get_object_or_404(Question, pk=question_id)
     choices = list(question.choices.all())
     total = sum(choice.votes for choice in choices)
@@ -45,7 +51,14 @@ def results(request, question_id):
         }
         for choice in choices
     ]
-    context = {'question': question, 'results': results_data, 'total': total}
+    # 领先项：只有真的有人投过才显示（total 为 0 时 max() 没有意义）
+    leading = max(choices, key=lambda c: c.votes) if total else None
+    context = {
+        'question': question,
+        'results': results_data,
+        'total': total,
+        'leading': leading,
+    }
     return render(request, 'polls/results.html', context)
 
 

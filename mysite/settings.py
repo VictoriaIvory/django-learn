@@ -44,6 +44,28 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
+# 开发用：允许局域网内其他设备访问（手机投票演示）。
+# 在 .env 里设 DJANGO_ALLOW_LAN=True，就会自动把本机当前的局域网 IP 加进白名单，
+# 免得每换一次网络（校园网 / 手机热点）都要手改 IP。
+#
+# 背景：Django 默认只认 ALLOWED_HOSTS 里列出的 Host，这是防「Host 头攻击」的安全设计。
+# 只把 runserver 改成 0.0.0.0 是不够的——别的设备能连上来，但 Host 不在白名单里仍会被拒（400）。
+# 生产环境不要开这个开关，应该显式写死域名。
+if os.environ.get('DJANGO_ALLOW_LAN', '').strip().lower() in ('1', 'true', 'yes', 'on'):
+    import socket
+
+    try:
+        # 连一个外网地址（UDP 不会真的发包），让系统帮我们选出「当前出网的那张网卡」
+        _sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        _sock.connect(('8.8.8.8', 80))
+        _lan_ip = _sock.getsockname()[0]
+        _sock.close()
+        if _lan_ip not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(_lan_ip)
+    except OSError:
+        # 完全断网时取不到 IP，忽略即可，本机访问不受影响
+        pass
+
 
 # Application definition
 
