@@ -97,6 +97,35 @@ class PollsViewsTests(TestCase):
         self.assertContains(response, '还没有人投票')
         self.assertNotContains(response, '目前领先')
 
+    def test_results_has_pie_chart_with_correct_segments(self):
+        """饼图两段应该是 75% 和 25%，第二段从 75% 处开始。"""
+        question = self.create_question('今天吃什么？')
+        Choice.objects.create(question=question, choice_text='火锅', votes=3)
+        Choice.objects.create(question=question, choice_text='烧烤', votes=1)
+
+        response = self.client.get(reverse('polls:results', args=(question.id,)))
+
+        self.assertContains(response, 'class="pie"')
+        self.assertContains(response, 'pathLength="100"')
+        # 模板注释不能漏到页面上（多行 {# #} 不会被当成注释，得用 {% comment %}）
+        self.assertNotContains(response, '{#')
+        # 第一段：长度 75%，从 0 开始
+        self.assertContains(response, 'stroke-dasharray="75.0 100"')
+        self.assertContains(response, 'stroke-dashoffset="-0.0"')
+        # 第二段：长度 25%，从 75% 开始
+        self.assertContains(response, 'stroke-dasharray="25.0 100"')
+        self.assertContains(response, 'stroke-dashoffset="-75.0"')
+
+    def test_no_pie_chart_when_nobody_voted(self):
+        """0 票时不画饼图，避免出现一个全灰的圆。"""
+        question = self.create_question('还没人投的题')
+        Choice.objects.create(question=question, choice_text='A')
+
+        response = self.client.get(reverse('polls:results', args=(question.id,)))
+
+        self.assertNotContains(response, 'class="pie"')
+        self.assertContains(response, '还没有人投票')
+
 
 class CreateQuestionTests(TestCase):
     """在网页上创建投票（不经过 admin）。"""

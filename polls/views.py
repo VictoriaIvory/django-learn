@@ -67,18 +67,30 @@ def detail(request, question_id):
 
 
 def results(request, question_id):
-    """结果页：显示每个选项的票数、占比，以及当前领先项。"""
+    """结果页：饼图 + 条形图 + 领先项。
+
+    饼图不用任何图表库：把每个选项的占比算出来，交给模板画成 SVG 圆弧。
+    所以这里要额外算出两样东西：
+      pie_len   —— 这段扇形占圆周的百分之几
+      pie_start —— 这段扇形从圆周的哪个位置开始（前面所有选项占比之和）
+    """
     question = get_object_or_404(Question, pk=question_id)
     choices = list(question.choices.all())
     total = sum(choice.votes for choice in choices)
-    # 在视图里算好百分比，模板只负责显示，逻辑和展示分开
-    results_data = [
-        {
+
+    results_data = []
+    running = 0.0
+    for choice in choices:
+        ratio = (choice.votes / total) if total else 0.0
+        results_data.append({
             'choice': choice,
-            'percent': round(choice.votes * 100 / total) if total else 0,
-        }
-        for choice in choices
-    ]
+            'percent': round(ratio * 100),          # 显示用整数
+            'bar_percent': round(ratio * 100, 2),   # 条形图宽度
+            'pie_len': round(ratio * 100, 3),       # 扇形长度
+            'pie_start': round(running * 100, 3),   # 扇形起点
+        })
+        running += ratio
+
     # 领先项：只有真的有人投过才显示（total 为 0 时 max() 没有意义）
     leading = max(choices, key=lambda c: c.votes) if total else None
     context = {

@@ -189,3 +189,75 @@ button:hover { background: var(--brand-dark); }
 }
 
 .field .error { margin: 6px 0 0; font-size: 13px; }
+
+/* ---------- 结果页：SVG 饼图 ---------- */
+.pie-card {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-bottom: 18px;
+}
+
+.pie {
+  width: 172px;
+  height: 172px;
+  flex: 0 0 auto;
+  transform: rotate(-90deg); /* 让第一段从 12 点方向开始 */
+}
+
+.pie-hole {
+  fill: none;
+  stroke: #eef2f7;
+  stroke-width: 8;
+}
+
+.pie-seg {
+  fill: none;
+  stroke: var(--seg, #94a3b8);
+  stroke-width: 8;
+  stroke-linecap: butt;
+  transition: stroke-width .18s;
+}
+
+.pie-seg:hover { stroke-width: 11; }
+
+.legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+  min-width: 220px;
+  flex: 1;
+}
+
+.legend li { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+
+.legend .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex: 0 0 auto;
+  background: var(--seg, #94a3b8);
+}
+
+.legend-name { flex: 1; }
+
+.legend-val {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* 每个选项一种颜色：--seg 同时供扇形描边和图例小方块使用 */
+.seg-0 { --seg: #2563eb; }
+.seg-1 { --seg: #22c55e; }
+.seg-2 { --seg: #f59e0b; }
+.seg-3 { --seg: #ef4444; }
+.seg-4 { --seg: #8b5cf6; }
+.seg-5 { --seg: #06b6d4; }

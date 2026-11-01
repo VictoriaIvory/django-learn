@@ -13,6 +13,35 @@
   {% endif %}
 </p>
 
+{% if total %}
+<section class="pie-card">
+  {% comment %}
+    纯 SVG 饼图：pathLength="100" 把圆周归一成 100 份，
+    于是 stroke-dasharray 可以直接写百分比，不用做三角函数计算。
+  {% endcomment %}
+  <svg class="pie" viewBox="0 0 42 42" role="img" aria-label="各选项票数占比饼图">
+    <circle class="pie-hole" cx="21" cy="21" r="15.9155" pathLength="100" />
+    {% for item in results %}
+      <circle class="pie-seg seg-{{ forloop.counter0 }}"
+              cx="21" cy="21" r="15.9155"
+              pathLength="100"
+              stroke-dasharray="{{ item.pie_len }} 100"
+              stroke-dashoffset="-{{ item.pie_start }}" />
+    {% endfor %}
+  </svg>
+
+  <ul class="legend">
+    {% for item in results %}
+      <li>
+        <span class="dot seg-{{ forloop.counter0 }}"></span>
+        <span class="legend-name">{{ item.choice.choice_text }}</span>
+        <span class="legend-val">{{ item.choice.votes }} 票 · {{ item.percent }}%</span>
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
 <ul class="results">
   {% for item in results %}
     <li>
@@ -21,7 +50,7 @@
         <strong>{{ item.choice.votes }} 票（{{ item.percent }}%）</strong>
       </div>
       <div class="bar-bg">
-        <div class="bar" style="width: {{ item.percent }}%"></div>
+        <div class="bar" style="width: {{ item.bar_percent }}%"></div>
       </div>
     </li>
   {% endfor %}

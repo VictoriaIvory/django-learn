@@ -113,7 +113,7 @@ django-learn/
 │   ├── views.py            # V —— 视图：处理请求、返回响应
 │   ├── urls.py             # 应用路由
 │   ├── admin.py            # 后台注册
-│   ├── tests.py            # 自动化测试（11 个用例，全部通过）
+│   ├── tests.py            # 自动化测试（13 个用例，全部通过）
 │   ├── migrations/         # 数据库迁移记录，不要手改
 │   ├── static/polls/       # 静态文件（CSS）
 │   └── management/commands/seed_demo.py   # 自定义命令：插演示数据
@@ -135,6 +135,7 @@ django-learn/
 | **模型 & ORM** | `polls/models.py` | 类 = 表，字段 = 列；`objects.filter()` 不用写 SQL |
 | **聚合查询 annotate** | `views.index` | `Count()` / `Sum()` 让数据库一次算出选项数和总票数 |
 | **ModelForm 与表单校验** | `polls/forms.py`、`views.create_question` | 自动生成字段；`clean()` 做整体校验 |
+| **纯 SVG 数据可视化** | `views.results`、`results.html` | 视图算扇形起止点，模板用 `stroke-dasharray` 画饼图，不引图表库 |
 | **外键关系** | `Choice.question` | `ForeignKey` + `related_name`，一对多 |
 | **数据库迁移** | `migrations/` | `makemigrations` 生成、`migrate` 执行 |
 | **后台管理** | `admin.py` | 注册模型就得到一整套增删改查页面 |
@@ -198,9 +199,10 @@ python manage.py runserver
 | 熟悉 Django 框架（MVT、路由、视图、模板、模型、ORM、admin、测试） | ✅ |
 | 跑通一个完整的小项目（投票系统，可投票、看结果、进后台） | ✅ |
 | **网页上自己创建投票**（不用进 admin，带表单校验） | ✅ |
+| **结果页饼图**（纯 SVG，零依赖） | ✅ |
 | 结果页加「总票数 + 领先选项」，首页显示每题票数 | ✅ |
 | 开放局域网访问，手机可投票（不再只能自己投） | ✅ |
-| 自动化测试从 5 个补到 11 个 | ✅ |
+| 自动化测试从 5 个补到 13 个 | ✅ |
 | 安装 Git、配置提交身份 | ✅ |
 | 项目推送到 GitHub | ✅ <https://github.com/VictoriaIvory/django-learn> |
 | 把仓库链接报给王逸轩 | ⬜ 话术见 `docs/群聊回复与GitHub指引.md` |
@@ -209,7 +211,7 @@ python manage.py runserver
 ## 7. 测试结果
 
 ```text
-Found 11 test(s).
+Found 13 test(s).
 CreateQuestionTests
 test_create_page_renders ............................. ok   # 创建页能打开
 test_create_question_with_two_choices ................ ok   # 创建成功并跳详情页
@@ -219,13 +221,19 @@ PollsViewsTests
 test_detail_returns_404_for_missing_question ......... ok
 test_index_lists_only_published_questions ............ ok   # 只显示已发布的题
 test_index_shows_total_votes ......................... ok   # annotate 算出总票数
+test_no_pie_chart_when_nobody_voted .................. ok   # 0 票不画饼图
+test_results_has_pie_chart_with_correct_segments ..... ok   # 扇形起止点算对、注释不漏
 test_results_page_shows_votes ........................ ok   # 百分比换算正确
 test_results_shows_leading_choice .................... ok   # 标出领先项
 test_results_with_no_votes_does_not_crash ............ ok   # 0 票时不 500
 test_vote_increments_and_redirects ................... ok   # 投票 +1 并重定向
 test_vote_without_choice_shows_error ................. ok   # 没选就提示
 
-Ran 11 tests  OK
+Ran 13 tests  OK
 ```
+
+> 饼图的做法：`pathLength="100"` 把圆周归一成 100 份，于是
+> `stroke-dasharray="<占比> 100"` 直接就是一段弧，`stroke-dashoffset="-<起点>"`
+> 控制它从哪儿开始。**不用三角函数，也不引任何图表库。**
 
 > 更细的概念讲解见 [`docs/Django学习笔记.md`](docs/Django学习笔记.md)
