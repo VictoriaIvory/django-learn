@@ -12,6 +12,8 @@ app_name = 'polls'
 urlpatterns = [
     # 首页：http://127.0.0.1:8000/polls/
     path('', views.index, name='index'),
+    # 创建投票：http://127.0.0.1:8000/polls/new/
+    path('new/', views.create_question, name='create_question'),
     # 详情页：http://127.0.0.1:8000/polls/5/
     path('<int:question_id>/', views.detail, name='detail'),
     # 结果页：http://127.0.0.1:8000/polls/5/results/

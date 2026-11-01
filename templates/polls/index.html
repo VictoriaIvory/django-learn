@@ -5,6 +5,10 @@
 {% block content %}
 <h1>进行中的投票</h1>
 
+<p class="toolbar">
+  <a href="{% url 'polls:create_question' %}">＋ 创建一个投票</a>
+</p>
+
 {% if latest_question_list %}
   <ul class="question-list">
     {% for question in latest_question_list %}
@@ -15,6 +19,6 @@
     {% endfor %}
   </ul>
 {% else %}
-  <p class="empty">还没有任何投票。去 <a href="/admin/">后台</a> 添加一个吧～</p>
+  <p class="empty">还没有任何投票。<a href="{% url 'polls:create_question' %}">创建一个</a> 吧～</p>
 {% endif %}
 {% endblock %}

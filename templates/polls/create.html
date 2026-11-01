@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}创建投票 · 投票系统{% endblock %}
+
+{% block content %}
+<h1>创建一个投票</h1>
+<p class="meta">填一个问题，至少两个选项。创建完就能直接投。</p>
+
+<form method="post" novalidate>
+  {% csrf_token %}
+
+  {% if form.non_field_errors %}
+    <p class="error">{{ form.non_field_errors.0 }}</p>
+  {% endif %}
+
+  {% for field in form %}
+    <div class="field">
+      <label for="{{ field.id_for_label }}">
+        {{ field.label }}{% if field.field.required %} <span class="req">*</span>{% endif %}
+      </label>
+      {{ field }}
+      {% for error in field.errors %}<p class="error">{{ error }}</p>{% endfor %}
+    </div>
+  {% endfor %}
+
+  <button type="submit">创建</button>
+</form>
+
+<p class="links">
+  <a href="{% url 'polls:index' %}">返回列表</a>
+</p>
+{% endblock %}

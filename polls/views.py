@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
+from .forms import QuestionCreateForm
 from .models import Choice, Question
 
 
@@ -30,6 +31,33 @@ def index(request):
     context = {'latest_question_list': latest_question_list}
     # render 会把 context 塞进模板，生成最终 HTML
     return render(request, 'polls/index.html', context)
+
+
+def create_question(request):
+    """在网页上创建一个投票（不用进 admin 后台）。
+
+    GET  → 显示空表单
+    POST → 校验通过后建 Question 和若干 Choice，然后跳到详情页去投票
+    """
+    if request.method == 'POST':
+        form = QuestionCreateForm(request.POST)
+        if form.is_valid():
+            # commit=False：先别写库，因为还要补 pub_date
+            question = form.save(commit=False)
+            question.pub_date = timezone.now()  # 发布时间由服务器决定
+            question.save()
+
+            # related_name='choices' 让我们能直接 question.choices.create(...)
+            for text in form.choice_texts():
+                question.choices.create(choice_text=text)
+
+            return HttpResponseRedirect(
+                reverse('polls:detail', args=(question.id,))
+            )
+    else:
+        form = QuestionCreateForm()
+
+    return render(request, 'polls/create.html', {'form': form})
 
 
 def detail(request, question_id):

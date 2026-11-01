@@ -59,6 +59,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
 | 页面 | 地址 |
 | --- | --- |
 | 投票列表 | <http://127.0.0.1:8000/polls/> |
+| **创建投票** | <http://127.0.0.1:8000/polls/new/> |
 | 问题详情 / 投票 | <http://127.0.0.1:8000/polls/1/> |
 | 投票结果 | <http://127.0.0.1:8000/polls/1/results/> |
 | 后台管理 | <http://127.0.0.1:8000/admin/> |
@@ -108,10 +109,11 @@ django-learn/
 │   ├── wsgi.py / asgi.py   # 部署入口（练习阶段用不到）
 ├── polls/                  # 我们写的应用
 │   ├── models.py           # M —— 数据模型（Question / Choice）
+│   ├── forms.py            # 表单：创建投票的 ModelForm + 自定义校验（至少两个选项）
 │   ├── views.py            # V —— 视图：处理请求、返回响应
 │   ├── urls.py             # 应用路由
 │   ├── admin.py            # 后台注册
-│   ├── tests.py            # 自动化测试（8 个用例，全部通过）
+│   ├── tests.py            # 自动化测试（11 个用例，全部通过）
 │   ├── migrations/         # 数据库迁移记录，不要手改
 │   ├── static/polls/       # 静态文件（CSS）
 │   └── management/commands/seed_demo.py   # 自定义命令：插演示数据
@@ -132,6 +134,7 @@ django-learn/
 | **模板渲染** | `templates/`、`render()` | `{{ 变量 }}`、`{% 标签 %}`、`{% extends %}` 继承 |
 | **模型 & ORM** | `polls/models.py` | 类 = 表，字段 = 列；`objects.filter()` 不用写 SQL |
 | **聚合查询 annotate** | `views.index` | `Count()` / `Sum()` 让数据库一次算出选项数和总票数 |
+| **ModelForm 与表单校验** | `polls/forms.py`、`views.create_question` | 自动生成字段；`clean()` 做整体校验 |
 | **外键关系** | `Choice.question` | `ForeignKey` + `related_name`，一对多 |
 | **数据库迁移** | `migrations/` | `makemigrations` 生成、`migrate` 执行 |
 | **后台管理** | `admin.py` | 注册模型就得到一整套增删改查页面 |
@@ -194,9 +197,10 @@ python manage.py runserver
 | 搭好 Django 环境（Python 3.12 + Django 5.2 + venv） | ✅ |
 | 熟悉 Django 框架（MVT、路由、视图、模板、模型、ORM、admin、测试） | ✅ |
 | 跑通一个完整的小项目（投票系统，可投票、看结果、进后台） | ✅ |
+| **网页上自己创建投票**（不用进 admin，带表单校验） | ✅ |
 | 结果页加「总票数 + 领先选项」，首页显示每题票数 | ✅ |
 | 开放局域网访问，手机可投票（不再只能自己投） | ✅ |
-| 自动化测试从 5 个补到 8 个 | ✅ |
+| 自动化测试从 5 个补到 11 个 | ✅ |
 | 安装 Git、配置提交身份 | ✅ |
 | 项目推送到 GitHub | ✅ <https://github.com/VictoriaIvory/django-learn> |
 | 把仓库链接报给王逸轩 | ⬜ 话术见 `docs/群聊回复与GitHub指引.md` |
@@ -205,7 +209,13 @@ python manage.py runserver
 ## 7. 测试结果
 
 ```text
-Found 8 test(s).
+Found 11 test(s).
+CreateQuestionTests
+test_create_page_renders ............................. ok   # 创建页能打开
+test_create_question_with_two_choices ................ ok   # 创建成功并跳详情页
+test_create_question_requires_two_choices ............ ok   # 少填选项会被拦下
+
+PollsViewsTests
 test_detail_returns_404_for_missing_question ......... ok
 test_index_lists_only_published_questions ............ ok   # 只显示已发布的题
 test_index_shows_total_votes ......................... ok   # annotate 算出总票数
@@ -215,8 +225,7 @@ test_results_with_no_votes_does_not_crash ............ ok   # 0 票时不 500
 test_vote_increments_and_redirects ................... ok   # 投票 +1 并重定向
 test_vote_without_choice_shows_error ................. ok   # 没选就提示
 
-Ran 8 tests in 0.099s
-OK
+Ran 11 tests  OK
 ```
 
 > 更细的概念讲解见 [`docs/Django学习笔记.md`](docs/Django学习笔记.md)

@@ -96,3 +96,43 @@ class PollsViewsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '还没有人投票')
         self.assertNotContains(response, '目前领先')
+
+
+class CreateQuestionTests(TestCase):
+    """在网页上创建投票（不经过 admin）。"""
+
+    def test_create_page_renders(self):
+        response = self.client.get(reverse('polls:create_question'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '创建一个投票')
+
+    def test_create_question_with_two_choices(self):
+        response = self.client.post(reverse('polls:create_question'), {
+            'question_text': '新的问题',
+            'choice_1': '选项 A',
+            'choice_2': '选项 B',
+            'choice_3': '',
+            'choice_4': '',
+        })
+
+        question = Question.objects.get(question_text='新的问题')
+        # 创建成功后应该跳到详情页，可以马上投票
+        self.assertRedirects(
+            response, reverse('polls:detail', args=(question.id,))
+        )
+        self.assertEqual(question.choices.count(), 2)
+        # 发布时间由服务器补上，不能是 None
+        self.assertIsNotNone(question.pub_date)
+
+    def test_create_question_requires_two_choices(self):
+        response = self.client.post(reverse('polls:create_question'), {
+            'question_text': '选项不够的题',
+            'choice_1': '只有一个',
+            'choice_2': '',
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '至少要填两个选项')
+        self.assertFalse(
+            Question.objects.filter(question_text='选项不够的题').exists()
+        )
